@@ -22,6 +22,7 @@ class RefreshAdminTokenMiddleware extends BaseMiddleware
      * @throws \Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException
      *
      * @return mixed
+     * @throws TokenInvalidException
      */
     public function handle($request, Closure $next)
     {
@@ -53,7 +54,7 @@ class RefreshAdminTokenMiddleware extends BaseMiddleware
             }
             throw new UnauthorizedHttpException('jwt-auth', '未登录');
         } catch (TokenExpiredException $exception) {
-            // 3. 此处捕获到了 token 过期所抛出的 TokenExpiredException 异常，在这里需要做的是刷新该用户的 token 并将它添加到响应头中
+            // 3. 此处捕获到了 token 过期所抛出的 TokenExpiredException 异常，我们在这里需要做的是刷新该用户的 token 并将它添加到响应头中
             try {
                 // 刷新用户的 token
                 $token = $this->auth->refresh();

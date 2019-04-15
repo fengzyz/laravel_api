@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Requests\Api\UserRequest;
+use App\Http\Requests\Api\AdminRequest;
 use App\Http\Resources\Api\AdminResource;
 use App\Models\Admin;
 use Illuminate\Http\Request;
@@ -20,7 +20,7 @@ class AdminController extends Controller
         return $this->success(new AdminResource($admin));
     }
     //用户注册
-    public function store(UserRequest $request){
+    public function store(AdminRequest $request){
         Admin::create($request->all());
         return $this->setStatusCode(201)->success('用户注册成功...');
     }
@@ -36,7 +36,7 @@ class AdminController extends Controller
                 try{
                     Auth::setToken($user->last_token)->invalidate();
                 }catch (TokenExpiredException $e){
-                    //因为让一个过期的token再失效，会抛出异常，所以捕捉异常，不需要做任何处理
+                    //因为让一个过期的token再失效，会抛出异常，所以我们捕捉异常，不需要做任何处理
                 }
             }
             $user->last_token = $token;
