@@ -35,7 +35,7 @@ Route::namespace('Api')->prefix('v1')->middleware('cors')->group(function () {
             Route::get('/logout', 'UserController@logout')->name('users.logout');
         });
     });
-
+    Route::get('/anchors', 'AnchorController@list')->name('anchor.list');
     Route::middleware('admin.guard')->group(function () {
         //管理员注册
         Route::post('/admins', 'AdminController@store')->name('admins.store');
