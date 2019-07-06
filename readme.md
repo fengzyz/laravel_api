@@ -3,7 +3,7 @@
 > PHP > 7.1  
   MySQL > 5.5  
   Redis > 2.8
-### 安装 Laravel
+### 安装 Laravel5.6
 
 > composer create-project laravel/laravel Laravel --prefer-dist "5.7.*"
 
