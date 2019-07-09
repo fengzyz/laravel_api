@@ -17,14 +17,17 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+
+
 Route::namespace('Api')->prefix('v1')->middleware('cors')->group(function () {
 
+    Route::get('/redis', 'RedisController@test')->name('redis.test');
     Route::middleware('api.guard')->group(function () {
         //用户注册
         Route::post('/users', 'UserController@store')->name('users.store');
         //用户登录
         Route::post('/login', 'UserController@login')->name('users.login');
-        Route::middleware('api.refresh')->group(function () {
+        Route::middleware('user.refresh')->group(function () {
             //当前用户信息
             Route::get('/users/info', 'UserController@info')->name('users.info');
             //用户列表

@@ -17,6 +17,7 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Tymon\JWTAuth\Exceptions\TokenInvalidException;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 
 class ExceptionReport
 {
@@ -61,6 +62,7 @@ class ExceptionReport
         TokenInvalidException::class=>['token不正确',400],
         NotFoundHttpException::class=>['没有找到该页面',404],
         MethodNotAllowedHttpException::class=>['访问方式不正确',405],
+        TokenExpiredException::class=>['token已过期',406],
         QueryException::class=>['参数错误',401],
     ];
 

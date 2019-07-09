@@ -15,6 +15,8 @@ class UserResource extends JsonResource
      */
     public function toArray($request)
     {
+
+
         switch ($this->status){
             case -1:
                 $this->status = '已删除';
@@ -28,7 +30,7 @@ class UserResource extends JsonResource
         }
         return [
             'id'=>$this->id,
-            'name' => $this->name,
+            'username' => $this->username,
             'status' => UserEnum::getStatusName($this->status),
             'created_at'=>(string)$this->created_at,
             'updated_at'=>(string)$this->updated_at

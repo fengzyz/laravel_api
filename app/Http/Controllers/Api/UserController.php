@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Http\Resources\Api\UserResource;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\Api\UserRequest;
+use EasyWeChat\Factory;
 
 class UserController extends Controller
 {
@@ -27,8 +28,25 @@ class UserController extends Controller
     //用户登录
     public function login(Request $request){
         //获取当前守护的名称
+
+        $code = $request->code;
+        $wechat = config('wechat.mini_program'); //读取小程序配置
+        $config = [
+            'app_id'=>$wechat['default']['app_id'],
+            'secret'=>$wechat['default']['secret']
+        ];
+
+        $app = Factory::miniProgram($config);
+        //获取openid session_key
+        $data = $app->auth->session($code);
+        //判断code是否过期
+        if (isset($data['errcode'])) {
+            //return $this->response->errorUnauthorized('code已过期或不正确');
+            return $this->failed('code已过期或不正确', 402);
+        }
         $present_guard =Auth::getDefaultDriver();
-        $token = Auth::claims(['guard'=>$present_guard])->attempt(['name' => $request->name, 'password' => $request->password]);
+        $token = Auth::claims(['guard'=>$present_guard])->attempt(['username' => $request->username, 'password' => $request->password]);
+
         if ($token) {
             //如果登陆，先检查原先是否有存token，有的话先失效，然后再存入最新的token
             $user = Auth::user();
@@ -56,4 +74,5 @@ class UserController extends Controller
         $user = Auth::guard('api')->user();
         return $this->success(new UserResource($user));
     }
+
 }
