@@ -25,43 +25,29 @@ class UserController extends Controller
         User::create($request->all());
         return $this->setStatusCode(201)->success('用户注册成功...');
     }
+
+
+    //获取openid
+    private function getSessionKey($code)
+    {
+        $config = config('wechat.mini_program.default');
+        $app = Factory::miniProgram($config);
+        return $app->auth->session($code);
+    }
     //用户登录
     public function login(Request $request){
-        //获取当前守护的名称
-
         $code = $request->code;
-        $wechat = config('wechat.mini_program'); //读取小程序配置
-        $config = [
-            'app_id'=>$wechat['default']['app_id'],
-            'secret'=>$wechat['default']['secret']
-        ];
-
-        $app = Factory::miniProgram($config);
-        //获取openid session_key
-        $data = $app->auth->session($code);
-        //判断code是否过期
-        if (isset($data['errcode'])) {
-            //return $this->response->errorUnauthorized('code已过期或不正确');
-            return $this->failed('code已过期或不正确', 402);
-        }
-        $present_guard =Auth::getDefaultDriver();
-        $token = Auth::claims(['guard'=>$present_guard])->attempt(['username' => $request->username, 'password' => $request->password]);
-
-        if ($token) {
-            //如果登陆，先检查原先是否有存token，有的话先失效，然后再存入最新的token
-            $user = Auth::user();
-            if ($user->last_token) {
-                try{
-                    Auth::setToken($user->last_token)->invalidate();
-                }catch (TokenExpiredException $e){
-                    //因为让一个过期的token再失效，会抛出异常，所以我们捕捉异常，不需要做任何处理
-                }
+        // 获取openid
+        if ($code) {
+            $wx_info = $this->getSessionKey($code);
+            if(isset($wx_info) && !empty($wx_info['errmsg'])){
+                return $this->failed($wx_info['errmsg'], 406);
             }
-            $user->last_token = $token;
-            $user->save();
-            return $this->setStatusCode(201)->success(['token' => 'bearer ' . $token]);
+            $openid = empty($wx_info['openid']) ? $request->openid : $wx_info['openid'];
+            $userInfo = User::where('openid', $openid)->first();
+        }else{
+            return $this->failed('code没有获取到', 401);
         }
-        return $this->failed('账号或密码错误', 400);
     }
 
     //用户退出

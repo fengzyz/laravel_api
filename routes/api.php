@@ -26,6 +26,7 @@ Route::namespace('Api')->prefix('v1')->middleware('cors')->group(function () {
         //用户注册
         Route::post('/users', 'UserController@store')->name('users.store');
         //用户登录
+       // Route::post('/auto_login', 'UserController@auto_login')->name('users.aotu_login');
         Route::post('/login', 'UserController@login')->name('users.login');
         Route::middleware('user.refresh')->group(function () {
             //当前用户信息
